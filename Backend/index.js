@@ -1,7 +1,15 @@
 const express = require('express')
-const UserRoute  = require('./routes/user') 
+const UserRoute  = require('./routes/userRoute') 
+
+const {mongoDbToConnect} = require('./connection')
 const app = express();
+
+const URL = 'mongodb+srv://webconceit:PasswordManager%40123@password-manager-cluste.xkmqz4k.mongodb.net/'
 const PORT = 8000
+
+
+// database
+const dbResponse = mongoDbToConnect(URL)
 
 
 app.get('/',(req,res) => {
