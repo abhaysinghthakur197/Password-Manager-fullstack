@@ -8,9 +8,9 @@ const storage = multer.diskStorage({
         cb(null, path.resolve(`./public/`));
     },
     filename: function (req, file, cb) {
-        const username = req.body.username; 
+        const firstName = req.body.firstName; 
         const currentDate = new Date().toISOString().slice(0, 10); 
-        const fileName = `${username}-${currentDate}-${file.originalname}`;
+        const fileName = `${firstName}-${currentDate}-${file.originalname}`;
         cb(null,fileName)
     }
 });
@@ -30,20 +30,24 @@ async function handleUserLogin(req,res)  {
 }
 
 async function handleSignUp(req,res)  {
-    const {fullName, email, password} = req.body;
+    const {firstName, lastName, email, password} = req.body;
+    console.log(req.body)
     try {
-        upload.single('profileImage')(req, res, async function (err) {
+        upload.single('avatar')(req, res, async function (err) {
+            
             if (err) {
                 console.error('Error uploading file:', err);
                 return res.status(500).json({ error: 'File upload error' });
             }
-        const profileImage = req.file ? req.file.path : null;
+        const avatar = req.file ? req.file.path : null;
+        console.log(req.file)
 
         await userModal.create({
-            fullName,
+            firstName,
+            lastName,
             email,
             password,
-            profileImage
+            avatar
          }); 
         res.status(201).json({message: 'Signup Successful'})
     })}
