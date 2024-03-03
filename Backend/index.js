@@ -1,15 +1,33 @@
 const express = require('express')
 const UserRoute  = require('./routes/userRoute') 
 
-const {mongoDbToConnect} = require('./connection')
+// const {mongoDbToConnect} = require('./connection')
+
+const mongoose = require('mongoose')
+
+// Adding cors for getting the req
+const cors = require('cors')
+
+
 const app = express();
 
-const URL = 'mongodb+srv://webconceit:PasswordManager%40123@password-manager-cluste.xkmqz4k.mongodb.net/'
+
+
+// const URL = 'mongodb+srv://webconceit:PasswordManager%40123@password-    manager-cluste.xkmqz4k.mongodb.net/'
+// const URL = 'mongodb://localhost:27017/passwordManager'
 const PORT = 8000
 
 
+app.use(cors({ origin: true, credentials: true }));
+
+
 // database
-const dbResponse = mongoDbToConnect(URL)
+// mongoDbToConnect(URL)
+mongoose.connect("mongodb://127.0.0.1:27017/passwordManager").then(console.log("connected")).catch((e) => console.log(e));
+
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 
 app.get('/',(req,res) => {
