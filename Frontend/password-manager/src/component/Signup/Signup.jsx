@@ -1,28 +1,41 @@
 import React, { useState } from 'react'
 import { Link, TextField, Button, Grid, Typography, makeStyles, Container, Avatar } from '@material-ui/core';
 
+import axios from 'axios'
+// import { Formik, Form, Field, ErrorMessage } from 'formik';
+// import * as Yup from 'yup';
+
+
 
 
 const useStyles = makeStyles((theme) => ({
+
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
       width: '80%',
 
     },
+    border: `2px solid grey`, // Border color slightly different from white
+    padding: theme.spacing(3),
+    borderRadius: theme.spacing(3),
+    backgroundColor: theme.palette.grey.main
   },
   avatarSection: {
     display: 'flex',
     justifyContent: 'center',
   },
   avatar: {
-    width: theme.spacing(10),
-    height: theme.spacing(10),
+    width: theme.spacing(8),
+    height: theme.spacing(8),
   }
 
 }));
 
 const Signup = () => {
+
+  const BackendURL='http://localhost:8000/api'
+
   const classes = useStyles();
   const [formData, setFormData] = useState({
     avatar: null,
@@ -40,44 +53,56 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Handle form submission here, for example, send formData to server
     console.log(formData);
+    try {
+      const response = await axios.post(`${BackendURL}/user/signup`, formData, {
+        withcredentials: true
+      },);
+
+      if(response.status === 201){
+        console.log("response",response)
+      }
+      
+    } catch (error) {
+        console.log("error on signup page react", error)
+    }
   };
 
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
-    setFormData ({
+    setFormData({
       ...formData,
       avatar: file
     })
   }
   return (
 
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" style={{marginTop: '45px'}}>
       <Grid spacing={2} justifyContent='center'>
         <Grid item >
-          <form className={classes.root} onSubmit={handleSubmit} style={{ border: '2px solid red' }}>
-            <Grid container direction="column" spacing={2}>
-
+          <form className={classes.root} onSubmit={handleSubmit} encType='multipart/form-data'>
+            <Grid container direction="column" spacing={1}>
               <Grid item>
                 <Typography variant="h4">Sign UP</Typography>
                 <Typography variant='subtitle1'>Create a new user</Typography>
               </Grid>
               <Grid item className={classes.avatarSection}>
-                <label htmlFor="avatar-upload">
-                  <Avatar 
-                  alt="profile" 
-                  className={classes.avatar}
-                  src={formData.avatar ? URL.createObjectURL(formData.avatar): ""} />
+                <label htmlFor="avatar">
+                  <Avatar
+                    alt="profile"
+                    className={classes.avatar}
+                    src={formData.avatar ? URL.createObjectURL(formData.avatar) : ""}
+                     />
                 </label>
-                <input 
-                type="file"
-                accept='image/'  
-                id='avatar-upload' 
-                style={{display: 'none'}}
-                onChange={handleAvatarChange}/>
+                <input
+                  type="file"
+                  accept='image/'
+                  id='avatar'
+                  name="avatar"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange} />
               </Grid>
               <Grid item>
                 <TextField
@@ -96,9 +121,7 @@ const Signup = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                 />
-
               </Grid>
-
               <Grid item>
                 <TextField
                   label="Email"
