@@ -1,15 +1,15 @@
-const {Schema, model}  = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const {createHmac, randomBytes} = require('crypto')
+const { createHmac, randomBytes } = require('crypto')
 
 const userSchema = new Schema(
     {
         firstName: {
-            type:String,
+            type: String,
             required: true,
         },
-        lastName : {
-            type : String,
+        lastName: {
+            type: String,
             required: true,
         },
         email: {
@@ -19,42 +19,47 @@ const userSchema = new Schema(
         },
         salt: {
             type: String,
-            
+
         },
         password: {
-            type:String,
+            type: String,
             required: true,
         },
         avatar: {
-            type:String,
-            default: "/images/default.png"
+            type: String,
+            default: "./public/images/default.png"
         },
         role: {
             type: String,
-            enum: ["USER","ADMIN"],
+            enum: ["USER", "ADMIN"],
             default: "USER",
         },
-    },{timestamps: true})
+    }, { timestamps: true })
 
-userSchema.pre('save', function (next) {
-    const user = this
-    console.log("user enter",user)
+userSchema.pre("save", function (next) {
+    try {
+        const user = this
+        console.log("user enter", user)
 
-    if(!user.isModified(user.password)) return ; 
+        if (!user.isModified("password")) return;
 
-    const salt = randomBytes(16).toString();
+        const salt = randomBytes(16).toString();
 
-    const hashedPassword = createHmac('sha256',salt)
-        .update(user.password)
-        .digest("hex");
+        const hashedPassword = createHmac('sha256', salt)
+            .update(user.password)
+            .digest("hex");
 
-    this.salt = salt 
-    this.password = hashedPassword
+        this.salt = salt
+        this.password = hashedPassword
 
-    next(); 
+        next();
+    } catch (error) {
+        console.log("error in pre save", error)
+    }
+
 })
 
 
-const User = model("user",userSchema);
+const userModel = model('user', userSchema);
 
-module.exports = User
+module.exports = userModel;
