@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Signup = () => {
 
-  const BackendURL='http://localhost:8000/api'
+  const BackendURL = 'http://localhost:8000/api'
 
   const classes = useStyles();
   const [formData, setFormData] = useState({
@@ -53,23 +53,6 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(formData);
-    try {
-      const response = await axios.post(`${BackendURL}/user/signup`, formData, {
-        withcredentials: true
-      },);
-
-      if(response.status === 201){
-        console.log("response",response)
-      }
-      
-    } catch (error) {
-        console.log("error on signup page react", error)
-    }
-  };
-
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
     setFormData({
@@ -77,29 +60,87 @@ const Signup = () => {
       avatar: file
     })
   }
+
+  const handleSubmit = async () => {
+    console.log(formData)
+    try {
+
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      const response = await axios.post(`${BackendURL}/user/signup`, formData, {
+        withCredentials: true,
+        headers: headers
+      });
+
+      if (response.status === 201) {
+        console.log("response", response)
+      }
+    } catch (error) {
+      console.log("error on signup page react", error)
+    }
+  };
+
+
+
+  const handleSignUp = (event) => {
+    event.preventDefault();
+    if (!formData.avatar) {
+      // If avatar is not selected, create a default avatar using the first letter of firstName
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 100;
+      canvas.height = 100;
+      context.fillStyle = '#000'; // Background color for the default avatar
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.font = '50px Arial'; // Font size and style for the initial
+      context.fillStyle = '#FFF'; // Color for the initial
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(formData.firstName.charAt(0).toUpperCase(), canvas.width / 2, canvas.height / 2);
+      const avatarName = formData.firstName.charAt(0).toUpperCase();
+      const avatarEmail = formData.email;
+  
+      // Convert canvas to blob and set it as avatar
+      canvas.toBlob((blob) => {
+        const file = new File([blob], `${avatarName}-${avatarEmail}.png`, { type: 'image/png' });
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          avatar: file
+        }));
+        
+        // Call handleSubmit after setting the avatar
+        handleSubmit();
+      }, 'image/png');
+    } else {
+      // If avatar already exists, directly call handleSubmit
+      handleSubmit();
+    }
+  };
+  
   return (
 
-    <Container maxWidth="sm" style={{marginTop: '45px'}}>
-      <Grid spacing={2} justifyContent='center'>
+    <Container maxWidth="sm" style={{ marginTop: '45px' }} spacing={2} justifycontent='center'>
+      <Grid >
         <Grid item >
-          <form className={classes.root} onSubmit={handleSubmit} encType='multipart/form-data'>
+          <form className={classes.root} onSubmit={handleSignUp} encType='multipart/form-data'>
             <Grid container direction="column" spacing={1}>
               <Grid item>
                 <Typography variant="h4">Sign UP</Typography>
                 <Typography variant='subtitle1'>Create a new user</Typography>
               </Grid>
               <Grid item className={classes.avatarSection}>
-                <label htmlFor="avatar">
+                <label htmlFor="avatar-upload">
                   <Avatar
                     alt="profile"
                     className={classes.avatar}
                     src={formData.avatar ? URL.createObjectURL(formData.avatar) : ""}
-                     />
+                  />
                 </label>
                 <input
                   type="file"
-                  accept='image/'
-                  id='avatar'
+                  // accept='image/'
+                  id='avatar-upload'
                   name="avatar"
                   style={{ display: 'none' }}
                   onChange={handleAvatarChange} />
@@ -143,7 +184,7 @@ const Signup = () => {
                 />
               </Grid>
               <Grid item>
-                <Button variant="contained" color="primary" type="submit">
+                <Button variant="contained" color="primary" type='submit'>
                   Sign Up
                 </Button>
               </Grid>
@@ -154,7 +195,7 @@ const Signup = () => {
               </Grid>
               <Grid item>
 
-                <Typography variant='p'>Click here to?
+                <Typography variant='subtitle2'>Click here to?
                   <Link> Log In</Link></Typography>
 
               </Grid>
