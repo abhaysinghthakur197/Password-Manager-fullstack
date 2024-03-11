@@ -13,14 +13,24 @@ async function userSignUp(req,res)  {
 }
 
 async function handleUserLogin(req,res)  {
-    res.send('<h1> login Page post side</h1>')
+    const {email,password} = req.body;
+    // console.log(req.body)
+    try {
+        const token = await userModel.matchPasswordandgenerateToken(email,password)
+        // console.log("token",token);
+        res.cookie("token",token)
+        return res.status(200).json({ message: "Signin successful"});
+    } catch (error) {
+        console.log("error in login",error)
+        res.json({message: 'Incorrect email or password'})    
+    }
 }
 
 async function handleSignUp(req,res)  {
     const {firstName, lastName, email, password} = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     const avatar = req.file ? req.file.path : null;
-    console.log(req.file)
+    // console.log(req.file)
     try {
         await userModel.create({
             firstName,
