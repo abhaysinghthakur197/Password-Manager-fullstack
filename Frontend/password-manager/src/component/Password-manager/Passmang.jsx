@@ -1,14 +1,24 @@
 import { Container, Grid, TextField, Typography, Button } from '@material-ui/core'
 import React, { useState } from 'react'
 import Box from '@mui/material/Box'
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import Table from '../Table/PassTable'
 
+import axios from 'axios'
 const Passmang = () => {
 
+    const BackendURL='http://localhost:8000/api'
+
+
     const [passData , setPassData] = useState({
-        key: '',
+        name: '',
         password: '',
-        description: ''
+        description: '',
+        time:''
     })
+
+
+    const [addTable, setAddTable] = useState(false);
 
     const handleChange = (event) => {
         const {name, value} = event.target;
@@ -18,8 +28,21 @@ const Passmang = () => {
           }));  
     }
 
-    const handlePassData = () => {
+
+    const handleAddData = async () => {
+        setPassData((prevData) => ({
+            ...prevData,
+            time : `${new Date().getDate()}/${new Date().getMonth()}/${new Date().getFullYear()}`
+        }))
         console.log(passData)
+        
+        try {
+            response = await axios.post(`${BackendURL}`)
+        } catch (error) {
+            console.log("error in uploading the data", error)
+        }
+        setAddTable(true)
+        
     }
     return (
         <Container style={{ border: '2px solid red' }}>
@@ -33,9 +56,9 @@ const Passmang = () => {
                 <Grid>
                     <Grid item xs={12} spacing={2}>
                         <TextField
-                            label="key"
+                            label="name"
                             variant="outlined"
-                            name="key"
+                            name="name"
                             type='text'
                             value={passData.key}
                             onChange={handleChange}
@@ -71,8 +94,10 @@ const Passmang = () => {
             </Grid>
 
             <Box m={5}>
-                <Button  variant="contained" sx={{ bgcolor: 'blue', color: 'white' }} onClick={handlePassData}>Add</Button>
+                <Button  variant="contained" sx={{ bgcolor: 'blue', color: 'white' }} onClick={handleAddData} startIcon={<AddCircleOutlineRoundedIcon />}>Add</Button>
             </Box>
+
+            {addTable && <Table passData= {passData} />}
 
         </Container >
     )
