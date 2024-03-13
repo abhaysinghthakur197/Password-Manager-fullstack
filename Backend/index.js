@@ -38,6 +38,7 @@ app.get('/',(req,res) => {
 })
 
 app.use('/api/user',UserRoute)
+app.use('api/passData', PassdataRoute)
 
 app.listen(PORT, () => {  
     console.log(`server is runnint at ${PORT}`)}
