@@ -1,5 +1,6 @@
 const express = require('express')
 const UserRoute  = require('./routes/userRoute') 
+const PassdataRoute = require('./routes/passdataRoute')
 
 // const {mongoDbToConnect} = require('./connection')
 
@@ -38,7 +39,7 @@ app.get('/',(req,res) => {
 })
 
 app.use('/api/user',UserRoute)
-app.use('api/passData', PassdataRoute)
+app.use('/api/passData', PassdataRoute)
 
 app.listen(PORT, () => {  
     console.log(`server is runnint at ${PORT}`)}
