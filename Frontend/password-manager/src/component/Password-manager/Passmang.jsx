@@ -1,5 +1,5 @@
 import { Container, Grid, TextField, Typography, Button } from '@material-ui/core'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import Table from '../Table/PassTable'
@@ -7,42 +7,69 @@ import Table from '../Table/PassTable'
 import axios from 'axios'
 const Passmang = () => {
 
-    const BackendURL='http://localhost:8000/api'
+    const BackendURL = 'http://localhost:8000/api'
 
 
-    const [passData , setPassData] = useState({
-        name: '',
+    const [passData, setPassData] = useState({
+        key: '',
         password: '',
         description: '',
-        time:''
     })
 
+    const [tableData, setTableData] = useState([])
 
-    const [addTable, setAddTable] = useState(false);
+    const fetchTableData = async () => {
+        try {
+            const response = await axios.get(`${BackendURL}/passData/`, {
+                withCredentials: true,
+            })
+
+            setTableData(response.data.map(formatCreatedAt))
+
+        } catch (error) {
+            console.log("error in getting the table Data", error)
+        }
+    }
+
+    useEffect(() => {
+        fetchTableData();
+    },[])
+
+    const formatCreatedAt = (data) => {
+        const createdAt = new Date(data.createdAt);
+        const formattedDate = `${createdAt.getDate()}/${createdAt.getMonth() + 1}/${createdAt.getFullYear()} : ${createdAt.getHours()}:${createdAt.getMinutes()}:${createdAt.getSeconds()}`;
+        return { ...data, createdAt: formattedDate };
+    }
+
 
     const handleChange = (event) => {
-        const {name, value} = event.target;
+        const { name, value } = event.target;
         setPassData((prevData) => ({
             ...prevData,
             [name]: value,
-          }));  
+        }));
     }
 
 
     const handleAddData = async () => {
-        setPassData((prevData) => ({
-            ...prevData,
-            time : `${new Date().getDate()}/${new Date().getMonth()}/${new Date().getFullYear()}`
-        }))
         console.log(passData)
-        
         try {
-            response = await axios.post(`${BackendURL}`)
+            const response = await axios.post(`${BackendURL}/passData/`, passData, {
+                withCredentials: true,
+            })
+            console.log(response)
+
+            setTableData([...tableData, passData])
+            setPassData({
+                key: '',
+                password: '',
+                description: ''
+            });
         } catch (error) {
             console.log("error in uploading the data", error)
         }
-        setAddTable(true)
-        
+
+
     }
     return (
         <Container style={{ border: '2px solid red' }}>
@@ -56,9 +83,9 @@ const Passmang = () => {
                 <Grid>
                     <Grid item xs={12} spacing={2}>
                         <TextField
-                            label="name"
+                            label="key"
                             variant="outlined"
-                            name="name"
+                            name="key"
                             type='text'
                             value={passData.key}
                             onChange={handleChange}
@@ -94,10 +121,10 @@ const Passmang = () => {
             </Grid>
 
             <Box m={5}>
-                <Button  variant="contained" sx={{ bgcolor: 'blue', color: 'white' }} onClick={handleAddData} startIcon={<AddCircleOutlineRoundedIcon />}>Add</Button>
+                <Button variant="contained" sx={{ bgcolor: 'blue', color: 'white' }} onClick={handleAddData} startIcon={<AddCircleOutlineRoundedIcon />}>Add</Button>
             </Box>
 
-            {addTable && <Table passData= {passData} />}
+            <Table data = {tableData} fetchTableData={fetchTableData}/>
 
         </Container >
     )
