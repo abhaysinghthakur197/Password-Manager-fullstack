@@ -1,6 +1,7 @@
+
 const { Schema, model } = require('mongoose')
 
-const passdataSchema = new Scheme(
+const passdataSchema = new Schema(
     {
         key: {
             type: String,

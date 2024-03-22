@@ -19,10 +19,10 @@ async function handleUserLogin(req,res)  {
         const token = await userModel.matchPasswordandgenerateToken(email,password)
         // console.log("token",token);
         res.cookie("token",token)
-        return res.status(200).json({ message: "Signin successful"});
+        return res.status(201).json({ message: "Signin successful"});
     } catch (error) {
         console.log("error in login",error)
-        res.json({message: 'Incorrect email or password'})    
+        res.status(404).json({error: 'Incorrect email or password'})    
     }
 }
 
