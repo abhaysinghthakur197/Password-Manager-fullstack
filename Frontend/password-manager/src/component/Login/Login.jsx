@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link, TextField, Button, Grid, Typography, makeStyles, Container, Avatar } from '@material-ui/core';
 
+import axios from 'axios'
+import { useNavigate, Link as RouterLink } from 'react-router-dom'
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import * as Yup from 'yup';
 
@@ -31,6 +33,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Login = () => {
+
+  const BackendURL='http://localhost:8000/api'
+
+  const navigate = useNavigate();
+
   const classes = useStyles();
   const [formData, setFormData] = useState({
     email: '',
@@ -45,9 +52,24 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(formData);
+    
+    try {
+      const response = await axios.post(`${BackendURL}/user/login`, formData, {
+        withCredentials: true
+      });
+
+      if(response.status === 201){
+        console.log("response",response)
+        alert("Login succesfully");
+        navigate('/password-manager')
+      }
+    } catch (error) {
+        console.log("error on signup page react", error)
+        navigate('/login')
+    }
   };
 
   
@@ -60,18 +82,7 @@ const Login = () => {
             <Grid container direction="column" spacing={1}>
               <Grid item>
                 <Typography variant="h4">Log In</Typography>
-                
-              </Grid>
-              <Grid item className={classes.avatarSection}>
-                <label htmlFor="avatar-upload">
-                  <Avatar
-                    alt="profile"
-                    className={classes.avatar}
-                    src={formData.avatar ? URL.createObjectURL(formData.avatar) : ""} />
-                </label>
-                
-              </Grid>
-              
+              </Grid>   
               <Grid item>
                 <TextField
                   label="Email"
@@ -100,8 +111,8 @@ const Login = () => {
               <Grid item>
 
                 <Typography variant='p'>Click here to?
-                  <Link> Sign Up</Link></Typography>
-
+                  <Link component={RouterLink} to="/signup"> Sign Up</Link>
+                </Typography>
               </Grid>
             </Grid>
           </form>

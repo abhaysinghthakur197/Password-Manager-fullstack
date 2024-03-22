@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, TextField, Button, Grid, Typography, makeStyles, Container, Avatar } from '@material-ui/core';
 
 import axios from 'axios'
+import { useNavigate, Link as RouterLink } from 'react-router-dom'
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import * as Yup from 'yup';
 
@@ -35,6 +36,8 @@ const useStyles = makeStyles((theme) => ({
 const Signup = () => {
 
   const BackendURL = 'http://localhost:8000/api'
+
+  const navigate = useNavigate();
 
   const classes = useStyles();
   const [formData, setFormData] = useState({
@@ -75,6 +78,9 @@ const Signup = () => {
 
       if (response.status === 201) {
         console.log("response", response)
+        alert("User signup succesfully");
+        navigate('/login')
+
       }
     } catch (error) {
       console.log("error on signup page react", error)
@@ -196,7 +202,7 @@ const Signup = () => {
               <Grid item>
 
                 <Typography variant='subtitle2'>Click here to?
-                  <Link> Log In</Link></Typography>
+                  <Link component={RouterLink} to="/login"> Log In</Link></Typography>
 
               </Grid>
             </Grid>
