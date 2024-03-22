@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
+const {checkForAuthenticationCookie} = require('./middleware/authentication')
 
 const app = express();
 
@@ -31,11 +32,13 @@ mongoose.connect("mongodb://127.0.0.1:27017/passwordManager").then(console.log("
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(checkForAuthenticationCookie("token"));
 
 
-
-app.get('/',(req,res) => {
-    res.send('<h1>Hello from Server Ji!!!</h1>')
+app.get('/api/passData',(req,res) => {
+    user = req.user
+    console.log("user",user)
+    res.redirect(user)
 })
 
 app.use('/api/user',UserRoute)
